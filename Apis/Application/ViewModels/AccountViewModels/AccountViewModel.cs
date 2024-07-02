@@ -8,16 +8,16 @@ namespace Application.ViewModels.AccountViewModels
 {
     public class AccountViewModel
     {
-        public int AccountId { get; set; }
+        public int UserId { get; set; }
 
         public string Username { get; set; }
 
         public string Password { get; set; }
 
-        public int RoleId { get; set; }
+        public string Name { get; set; }
 
-        public int? AssociatedId { get; set; }
+        public int? RoleId { get; set; }
 
-        public int? TotalPoint { get; set; }
+        public string Phone { get; set; }
     }
 }

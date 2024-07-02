@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
+using Application.Services;
 using Application.ViewModels.RoleViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +12,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class RoleController : BaseController
     {
         private readonly IRoleService _roleService;
@@ -21,9 +23,9 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<RoleViewModel>>> GetRoles()
+        public async Task<ActionResult<Pagination<RoleViewModel>>> GetRoles([FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
         {
-            var roles = await _roleService.GetRolesAsync();
+            var roles = await _roleService.GetRolesAsync(pageIndex, pageSize);
             return Ok(roles);
         }
 

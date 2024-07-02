@@ -2,13 +2,14 @@
 using Application.Commons;
 using Domain.Entities;
 using Application.ViewModels.PackageViewModels;
-using Application.ViewModels.CustomerViewModels;
 using Application.ViewModels.RestaurantViewModels;
 using Application.ViewModels.OrderViewModels;
 using Application.ViewModels.RoleViewModels;
 using Application.ViewModels.ReviewViewModels;
 using Application.ViewModels.AccountViewModels;
 using Application.ViewModels.RequestModels;
+using Application.ViewModels.WalletViewModels;
+using Application.ViewModels.TransactionViewModels;
 
 namespace Infrastructures.Mappers
 {
@@ -21,10 +22,6 @@ namespace Infrastructures.Mappers
             CreateMap<Package, PackageViewModel>().ForMember(dest => dest.PackageId, src => src.MapFrom(x => x.PackageId));
             CreateMap<UpdatePackageViewModel, Package>();
 
-            // Customer mappings
-            CreateMap<CreateCustomerViewModel, Customer>();
-            CreateMap<Customer, CustomerViewModel>().ForMember(dest => dest.CustomerId, src => src.MapFrom(x => x.CustomerId));
-            CreateMap<UpdateCustomerViewModel, Customer>();
 
             // Restaurant mappings
             CreateMap<CreateRestaurantViewModel, Restaurant>();
@@ -37,19 +34,31 @@ namespace Infrastructures.Mappers
             CreateMap<UpdateOrderViewModel, Order>();
 
             // Review mappings
-            CreateMap<CreateReviewViewModel, Review>();
-            CreateMap<Review, ReviewViewModel>().ForMember(dest => dest.ReviewId, src => src.MapFrom(x => x.ReviewId));
+            CreateMap<CreateReviewViewModel, Review>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.CustomerId));
+            CreateMap<Review, ReviewViewModel>()
+                .ForMember(dest => dest.ReviewId, src => src.MapFrom(x => x.ReviewId))
+                .ForMember(dest => dest.CustomerId, src => src.MapFrom(x => x.UserId)); 
             CreateMap<UpdateReviewViewModel, Review>();
-
             // Role mappings
             CreateMap<CreateRoleViewModel, Role>();
             CreateMap<Role, RoleViewModel>().ForMember(dest => dest.RoleId, src => src.MapFrom(x => x.RoleId));
             CreateMap<UpdateRoleViewModel, Role>();
 
             //Account mappings
-            CreateMap<Account, AccountViewModel>();
-            CreateMap<UpdateAccountViewModel, Account>();
-            CreateMap<RegisterRequestModel, Account>();
+            CreateMap<User, AccountViewModel>();
+            CreateMap<UpdateAccountViewModel, User>();
+            CreateMap<RegisterRequestModel, User>();
+
+            //Wallet mappings
+            CreateMap<Wallet, WalletViewModel>();
+            CreateMap<CreateWalletViewModel, Wallet>();
+            CreateMap<UpdateWalletViewModel, Wallet>();
+
+            //Transaction mappings
+            CreateMap<Transaction, TransactionViewModel>();
+            CreateMap<CreateTransactionViewModel, Transaction>();
+            CreateMap<UpdateTransactionViewModel, Transaction>();
 
             // Pagination mapping (Chỉ định nghĩa một lần duy nhất)
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));

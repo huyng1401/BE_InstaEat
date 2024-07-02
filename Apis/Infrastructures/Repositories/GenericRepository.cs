@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Repositories;
+using System.Linq.Expressions;
 
 namespace Infrastructures.Repositories
 {
@@ -54,6 +55,10 @@ namespace Infrastructures.Repositories
         {
             return await _dbSet.Where(e => EF.Property<bool>(e, "IsDeleted") == false).ToListAsync();
         }
+        public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _dbSet.AnyAsync(predicate);
+        }
 
 
         public async Task<Pagination<TEntity>> PaginateList(List<TEntity> list, int pageIndex = 0, int pageSize = 10)
@@ -91,10 +96,16 @@ namespace Infrastructures.Repositories
 
             return result;
         }
+        public async Task<Pagination<TEntity>> PaginateFiltered(Expression<Func<TEntity, bool>> filter, int pageIndex = 0, int pageSize = 10)
+        {
+            var filteredList = await _dbSet.Where(filter).ToListAsync();
+            return await PaginateList(filteredList, pageIndex, pageSize);
+        }
 
         public void UpdateRange(List<TEntity> entities)
         {
             _dbSet.UpdateRange(entities);
         }
+
     }
 }

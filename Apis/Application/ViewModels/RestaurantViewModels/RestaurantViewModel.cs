@@ -9,6 +9,7 @@ namespace Application.ViewModels.RestaurantViewModels
     public class RestaurantViewModel
     {
         public int RestaurantId { get; set; }
+        public int UserId { get; set; }
         public string RestaurantName { get; set; }
         public string Address { get; set; }
         public string Image { get; set; }

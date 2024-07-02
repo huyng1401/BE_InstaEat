@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Infrastructures.Repositories
 {
-    public class CustomerRepository : GenericRepository<Customer>, ICustomerRepository
+    internal class WalletRepository : GenericRepository<Wallet>, IWalletRepository
     {
-        public CustomerRepository(AppDbContext context) : base(context)
+        public WalletRepository(AppDbContext context) : base(context)
         {
 
         }

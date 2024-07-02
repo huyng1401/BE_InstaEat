@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
 using Application.ViewModels.AccountViewModels;
 using Application.ViewModels.RequestModels;
 using Microsoft.AspNetCore.Authorization;
@@ -22,9 +23,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<AccountViewModel>>> GetAccounts()
+        public async Task<ActionResult<Pagination<AccountViewModel>>> GetAccounts([FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
         {
-            var accounts = await _accountService.GetAccountsAsync();
+            var accounts = await _accountService.GetAccountsAsync(pageIndex, pageSize);
             return Ok(accounts);
         }
 
@@ -34,7 +35,7 @@ namespace WebAPI.Controllers
             var account = await _accountService.GetAccountByIdAsync(id);
             if (account == null)
             {
-                return NotFound("Account not found.");
+                return NotFound("User not found.");
             }
             return Ok(account);
         }
@@ -47,13 +48,42 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var account = await _accountService.Register(register);
-            if (account == null)
+            try
             {
-                return BadRequest("Unable to register account.");
+                var account = await _accountService.Register(register);
+                if (account == null)
+                {
+                    return BadRequest("Unable to register user.");
+                }
+                return CreatedAtAction(nameof(GetAccountById), new { id = account.UserId }, account);
             }
-            return CreatedAtAction(nameof(GetAccountById), new { id = account.AccountId }, account);
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+        [HttpPost("register/restaurant")]
+        public async Task<ActionResult<AccountViewModel>> RegisterAsRestaurant([FromBody] RegisterAsRestaurantRequestModel register)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var user = await _accountService.RegisterAsRestaurant(register);
+                if (user == null)
+                {
+                    return BadRequest("Unable to register user as restaurant.");
+                }
+                return CreatedAtAction(nameof(GetAccountById), new { id = user.UserId }, user);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
         [HttpPost("login")]
         [AllowAnonymous]
@@ -80,10 +110,17 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var isUpdated = await _accountService.UpdateAccountAsync(id, updateAccountViewModel);
-            if (!isUpdated)
+            try
             {
-                return NotFound("Account not found.");
+                var isUpdated = await _accountService.UpdateAccountAsync(id, updateAccountViewModel);
+                if (!isUpdated)
+                {
+                    return NotFound("Account not found.");
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
             return Ok("Successfully Updated!");
         }

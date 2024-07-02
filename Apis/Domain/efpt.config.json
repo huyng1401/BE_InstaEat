@@ -15,14 +15,6 @@
    "T4TemplatePath": null,
    "Tables": [
       {
-         "Name": "[dbo].[Account]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[Customer]",
-         "ObjectType": 0
-      },
-      {
          "Name": "[dbo].[Order]",
          "ObjectType": 0
       },
@@ -44,6 +36,14 @@
       },
       {
          "Name": "[dbo].[Transaction]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[User]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Wallet]",
          "ObjectType": 0
       }
    ],

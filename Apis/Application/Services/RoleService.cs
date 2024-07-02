@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
+using Application.Utils;
 using Application.ViewModels.RoleViewModels;
 using AutoMapper;
 using Domain.Entities;
@@ -20,11 +22,11 @@ namespace Application.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<List<RoleViewModel>> GetRolesAsync()
+        public async Task<Pagination<RoleViewModel>> GetRolesAsync(int pageIndex = 0, int pageSize = 10)
         {
             var roles = await _unitOfWork.RoleRepository.GetAllNotDeletedAsync();
-            var result = _mapper.Map<List<RoleViewModel>>(roles);
-            return result;
+            var paginatedRoles = await ListPagination<RoleViewModel>.PaginateList(_mapper.Map<List<RoleViewModel>>(roles), pageIndex, pageSize);
+            return paginatedRoles;
         }
 
         public async Task<RoleViewModel?> GetRoleByIdAsync(int roleId)
@@ -39,12 +41,26 @@ namespace Application.Services
 
         public async Task<RoleViewModel?> CreateRoleAsync(CreateRoleViewModel role)
         {
+            var existingRole = await _unitOfWork.RoleRepository.GetAllNotDeletedAsync();
+            if (existingRole.Any(r => r.RoleName == role.RoleName))
+            {
+                throw new ArgumentException("A role with the same name already exists.");
+            }
+
             var roleObj = _mapper.Map<Role>(role);
             await _unitOfWork.RoleRepository.AddAsync(roleObj);
-            var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
-            if (isSuccess)
+            try
             {
-                return _mapper.Map<RoleViewModel>(roleObj);
+                var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                if (isSuccess)
+                {
+                    return _mapper.Map<RoleViewModel>(roleObj);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message ?? ex.Message);
+                throw;
             }
             return null;
         }

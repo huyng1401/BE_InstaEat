@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructures.Repositories
 {
-    public class AccountRepository : GenericRepository<Account>, IAccountRepository
+    public class AccountRepository : GenericRepository<User>, IAccountRepository
     {
         public AccountRepository(AppDbContext context) : base(context)
         {

@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
+using Application.Services;
 using Application.ViewModels.PackageViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,9 +23,9 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<PackageViewModel>>> GetPackages()
+        public async Task<ActionResult<Pagination<PackageViewModel>>> GetPackages([FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
         {
-            var packages = await _packageService.GetPackagesAsync();
+            var packages = await _packageService.GetPackagesAsync(pageIndex, pageSize);
             return Ok(packages);
         }
 
@@ -33,7 +35,7 @@ namespace API.Controllers
             var package = await _packageService.GetPackageByIdAsync(id);
             if (package == null)
             {
-                return NotFound();
+                return NotFound("Package not found.");
             }
             return Ok(package);
         }
@@ -63,7 +65,7 @@ namespace API.Controllers
             var isUpdated = await _packageService.UpdatePackageAsync(id, updatePackageViewModel);
             if (!isUpdated)
             {
-                return NotFound();
+                return NotFound("Package not found.");
             }
             return Ok("Successfully Updated!!");
         }
@@ -74,7 +76,7 @@ namespace API.Controllers
             var isDeleted = await _packageService.DeletePackageAsync(id);
             if (!isDeleted)
             {
-                return NotFound();
+                return NotFound("Package not found.");
             }
             return Ok("Successfully Deleted!!");
         }

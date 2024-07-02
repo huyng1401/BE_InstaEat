@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
 using Application.ViewModels.ReviewViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +21,15 @@ namespace API.Controllers
             _reviewService = reviewService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<ReviewViewModel>>> GetReviews()
+        [HttpGet("restaurant")]
+        public async Task<ActionResult<Pagination<ReviewViewModel>>> GetReviewsByStatus(int status, int pageIndex = 0, int pageSize = 10)
         {
-            var reviews = await _reviewService.GetReviewsAsync();
+            var reviews = await _reviewService.GetReviewsByStatusAsync(status, pageIndex, pageSize);
             return Ok(reviews);
         }
 
-        [HttpGet("{id}")]
+
+        [HttpGet("restaurant/{id}")]
         public async Task<ActionResult<ReviewViewModel>> GetReviewById(int id)
         {
             var review = await _reviewService.GetReviewByIdAsync(id);
@@ -38,8 +40,8 @@ namespace API.Controllers
             return Ok(review);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<ReviewViewModel>> CreateReview([FromBody] CreateReviewViewModel createReviewViewModel)
+        [HttpPost("restaurant")]
+        public async Task<ActionResult<ReviewViewModel>> CreateReview([FromForm] CreateReviewViewModel createReviewViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -54,8 +56,28 @@ namespace API.Controllers
 
             return CreatedAtAction(nameof(GetReviewById), new { id = review.ReviewId }, review);
         }
-
-        [HttpPut("{id}")]
+        [HttpPost("accept/{reviewId}")]
+        public async Task<IActionResult> AcceptReview(int reviewId)
+        {
+            try
+            {
+                var isAccepted = await _reviewService.AcceptReviewAsync(reviewId);
+                if (!isAccepted)
+                {
+                    return BadRequest("Unable to accept review.");
+                }
+                return Ok("Review accepted and points transferred.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("restaurant/{id}")]
         public async Task<IActionResult> UpdateReview(int id, [FromBody] UpdateReviewViewModel updateReviewViewModel)
         {
             if (!ModelState.IsValid)
@@ -79,7 +101,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("restaurant/{id}")]
         public async Task<IActionResult> DeleteReview(int id)
         {
             var isDeleted = await _reviewService.DeleteReviewAsync(id);

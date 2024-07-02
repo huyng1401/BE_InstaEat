@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,7 @@ builder.Services.AddSingleton(configuration);
 builder.Services.AddSingleton(configuration);
 //builder.Services.Configure<MomoConfig>(builder.Configuration.GetSection(MomoConfig.ConfigName)
 //    );
+builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobConnectionString")));
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

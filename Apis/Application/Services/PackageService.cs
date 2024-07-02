@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
+using Application.Utils;
 using Application.ViewModels.PackageViewModels;
 using AutoMapper;
 using Domain.Entities;
@@ -20,11 +22,11 @@ namespace Application.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<List<PackageViewModel>> GetPackagesAsync()
+        public async Task<Pagination<PackageViewModel>> GetPackagesAsync(int pageIndex = 0, int pageSize = 10)
         {
             var packages = await _unitOfWork.PackageRepository.GetAllNotDeletedAsync();
-            var result = _mapper.Map<List<PackageViewModel>>(packages);
-            return result;
+            var paginatedAccounts = await ListPagination<PackageViewModel>.PaginateList(_mapper.Map<List<PackageViewModel>>(packages), pageIndex, pageSize);
+            return paginatedAccounts;
         }
 
         public async Task<PackageViewModel?> GetPackageByIdAsync(int packageId)

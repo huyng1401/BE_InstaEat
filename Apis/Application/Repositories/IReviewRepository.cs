@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.Commons;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,6 @@ namespace Application.Repositories
 {
     public interface IReviewRepository : IGenericRepository<Review>
     {
+        Task<Pagination<Review>> GetReviewsByStatusAsync(int status, int pageIndex = 0, int pageSize = 10);
     }
 }

@@ -1,4 +1,6 @@
-﻿using Application.ViewModels.PackageViewModels;
+﻿using Application.Commons;
+using Application.ViewModels.AccountViewModels;
+using Application.ViewModels.PackageViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,7 @@ namespace Application.Interfaces
 {
     public interface IPackageService
     {
-        Task<List<PackageViewModel>> GetPackagesAsync();
+        Task<Pagination<PackageViewModel>> GetPackagesAsync(int pageIndex = 0, int pageSize = 10);
         Task<PackageViewModel?> GetPackageByIdAsync(int packageId);
         Task<PackageViewModel?> CreatePackageAsync(CreatePackageViewModel package);
         Task<bool> UpdatePackageAsync(int packageId, UpdatePackageViewModel package);

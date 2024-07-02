@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
 using Application.ViewModels.OrderViewModels;
 using AutoMapper;
 using Domain.Entities;
@@ -19,7 +20,12 @@ namespace Application.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
+        public async Task<Pagination<OrderViewModel>> GetOrdersByDateRangeAsync(DateTime minDate, DateTime maxDate, int pageIndex = 0, int pageSize = 10)
+        {
+            var ordersPagination = await _unitOfWork.OrderRepository.GetOrdersByDateRangeAsync(minDate, maxDate, pageIndex, pageSize);
+            var ordersViewModel = _mapper.Map<Pagination<OrderViewModel>>(ordersPagination);
+            return ordersViewModel;
+        }
         public async Task<List<OrderViewModel>> GetOrdersAsync()
         {
             var orders = await _unitOfWork.OrderRepository.GetAllNotDeletedAsync();
@@ -65,6 +71,46 @@ namespace Application.Services
                 return _mapper.Map<OrderViewModel>(orderEntity);
             }
             return null;
+        }
+        public async Task<bool> AddPointsToRestaurantWalletAsync(int restaurantId, int packageId)
+        {
+            var restaurant = await _unitOfWork.RestaurantRepository.GetByIdAsync(restaurantId);
+            if (restaurant == null || restaurant.IsDeleted == true)
+            {
+                throw new ArgumentException("Restaurant not found or has been deleted.");
+
+            }
+            var user = await _unitOfWork.AccountRepository.GetByIdAsync(restaurant.UserId.Value);
+            if (user == null || user.IsDeleted == true || user.RoleId != 3)
+            {
+                throw new ArgumentException("User not found, has been deleted, or is not a restaurant.");
+            }
+            var restaurantWallet = await _unitOfWork.WalletRepository.GetByIdAsync(restaurant.UserId.Value);
+            if (restaurantWallet == null || restaurantWallet.IsDeleted == true)
+            {
+                throw new ArgumentException("Restaurant wallet not found.");
+            }
+
+            var package = await _unitOfWork.PackageRepository.GetByIdAsync(packageId);
+            if (package == null || package.IsDeleted == true)
+            {
+                throw new ArgumentException("Package not found or has been deleted.");
+            }
+
+            var order = new Order
+            {
+                RestaurantId = restaurantId,
+                PackageId = packageId,
+                OrderDate = DateTime.Now,
+                IsDeleted = false
+            };
+            await _unitOfWork.OrderRepository.AddAsync(order);
+            await _unitOfWork.SaveChangeAsync();
+
+            restaurantWallet.TotalPoint += package.Point.Value;
+            _unitOfWork.WalletRepository.Update(restaurantWallet);
+
+            return await _unitOfWork.SaveChangeAsync() > 0;
         }
 
         public async Task<bool> UpdateOrderAsync(int orderId, UpdateOrderViewModel order)

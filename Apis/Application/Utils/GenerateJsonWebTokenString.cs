@@ -12,7 +12,7 @@ namespace Application.Utils
 {
     public static class GenerateJsonWebTokenString
     {
-        public static string GenerateJsonWebToken(this Account account, string secretKey, DateTime now)
+        public static string GenerateJsonWebToken(this User account, string secretKey, DateTime now)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -23,7 +23,7 @@ namespace Application.Utils
             };
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: now.AddMinutes(15),
+                expires: now.AddHours(24),
                 signingCredentials: credentials);
 
 

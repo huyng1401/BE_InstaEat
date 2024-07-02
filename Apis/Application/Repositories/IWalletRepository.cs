@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Repositories
 {
-    public interface ICustomerRepository : IGenericRepository<Customer>
+    public interface IWalletRepository : IGenericRepository<Wallet>
     {
     }
 }

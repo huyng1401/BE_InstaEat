@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
+using Application.Services;
 using Application.ViewModels.RestaurantViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +24,9 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<RestaurantViewModel>>> GetRestaurants()
+        public async Task<ActionResult<Pagination<RestaurantViewModel>>> GetRestaurants([FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10)
         {
-            var restaurants = await _restaurantService.GetRestaurantsAsync();
+            var restaurants = await _restaurantService.GetRestaurantsAsync(pageIndex, pageSize);
             return Ok(restaurants);
         }
 
@@ -34,27 +36,11 @@ namespace API.Controllers
             var restaurant = await _restaurantService.GetRestaurantByIdAsync(id);
             if (restaurant == null)
             {
-                return NotFound();
+                return NotFound("Restaurant not found.");
             }
             return Ok(restaurant);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<RestaurantViewModel>> CreateRestaurant([FromBody] CreateRestaurantViewModel createRestaurantViewModel)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var restaurant = await _restaurantService.CreateRestaurantAsync(createRestaurantViewModel);
-            if (restaurant == null)
-            {
-                return BadRequest("Unable to create restaurant.");
-            }
-
-            return CreatedAtAction(nameof(GetRestaurantById), new { id = restaurant.RestaurantId }, restaurant);
-        }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRestaurant(int id, [FromBody] UpdateRestaurantViewModel updateRestaurantViewModel)
@@ -67,7 +53,7 @@ namespace API.Controllers
             var isUpdated = await _restaurantService.UpdateRestaurantAsync(id, updateRestaurantViewModel);
             if (!isUpdated)
             {
-                return NotFound();
+                return NotFound("Restaurant not found.");
             }
 
             return Ok("Successfully Updated!!");

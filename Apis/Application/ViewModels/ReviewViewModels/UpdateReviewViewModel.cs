@@ -15,8 +15,6 @@ namespace Application.ViewModels.ReviewViewModels
         public int? RestaurantId { get; set; }
         [Required(ErrorMessage = "Content is required")]
         public string? Content { get; set; }
-        [Required(ErrorMessage = "Image is required")]
-        public string? Image { get; set; }
         [Required(ErrorMessage = "Status is required")]
         public int? Status { get; set; }
 

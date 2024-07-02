@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
 using Application.ViewModels.OrderViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +23,9 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<OrderViewModel>>> GetOrders()
+        public async Task<ActionResult<Pagination<OrderViewModel>>> GetOrdersByDateRange([FromQuery] DateTime minDate, [FromQuery] DateTime maxDate, int pageIndex = 0, int pageSize = 10)
         {
-            var orders = await _orderService.GetOrdersAsync();
+            var orders = await _orderService.GetOrdersByDateRangeAsync(minDate, maxDate, pageIndex, pageSize);
             return Ok(orders);
         }
 
@@ -34,28 +35,23 @@ namespace API.Controllers
             var order = await _orderService.GetOrderByIdAsync(id);
             if (order == null)
             {
-                return NotFound();
+                return NotFound("Order not found.");
             }
             return Ok(order);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<OrderViewModel>> CreateOrder([FromBody] CreateOrderViewModel createOrderViewModel)
+        [HttpPost("add-points")]
+        public async Task<IActionResult> AddPointsToRestaurantWallet([FromQuery] int restaurantId, [FromQuery] int packageId)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             try
             {
-                var order = await _orderService.CreateOrderAsync(createOrderViewModel);
-                if (order == null)
+                var isSuccess = await _orderService.AddPointsToRestaurantWalletAsync(restaurantId, packageId);
+                if (!isSuccess)
                 {
-                    return BadRequest("Unable to create order.");
+                    return BadRequest("Unable to add points.");
                 }
 
-                return CreatedAtAction(nameof(GetOrderById), new { id = order.OrderId }, order);
+                return Ok("Points added to restaurant wallet successfully.");
             }
             catch (ArgumentException ex)
             {
@@ -76,7 +72,7 @@ namespace API.Controllers
                 var isUpdated = await _orderService.UpdateOrderAsync(id, updateOrderViewModel);
                 if (!isUpdated)
                 {
-                    return NotFound();
+                    return NotFound("Order not found.");
                 }
 
                 return Ok("Successfully Updated!!");
@@ -93,7 +89,7 @@ namespace API.Controllers
             var isDeleted = await _orderService.DeleteOrderAsync(id);
             if (!isDeleted)
             {
-                return NotFound();
+                return NotFound("Order not found.");
             }
 
             return Ok("Successfully Deleted!!");

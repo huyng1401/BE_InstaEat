@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.ViewModels.ReviewViewModels
@@ -12,6 +13,6 @@ namespace Application.ViewModels.ReviewViewModels
         [Required(ErrorMessage = "Content is required")]
         public string? Content { get; set; }
         [Required(ErrorMessage = "Image is required")]
-        public string? Image { get; set; }
+        public IFormFile Image { get; set; }
     }
 }

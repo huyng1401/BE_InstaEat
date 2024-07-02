@@ -1,4 +1,6 @@
-﻿using Application.ViewModels.OrderViewModels;
+﻿using Application.Commons;
+using Application.ViewModels.OrderViewModels;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +16,8 @@ namespace Application.Interfaces
         Task<OrderViewModel?> CreateOrderAsync(CreateOrderViewModel order);
         Task<bool> UpdateOrderAsync(int orderId, UpdateOrderViewModel order);
         Task<bool> DeleteOrderAsync(int orderId);
+        Task<Pagination<OrderViewModel>> GetOrdersByDateRangeAsync(DateTime minDate, DateTime maxDate, int pageIndex = 0, int pageSize = 10);
+        Task<bool> AddPointsToRestaurantWalletAsync(int restaurantId, int packageId);
+
     }
 }

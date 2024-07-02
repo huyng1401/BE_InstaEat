@@ -1,4 +1,5 @@
-﻿using Application.Repositories;
+﻿using Application.Commons;
+using Application.Repositories;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,10 @@ namespace Infrastructures.Repositories
         public ReviewRepository(AppDbContext context) : base(context)
         {
 
+        }
+        public async Task<Pagination<Review>> GetReviewsByStatusAsync(int status, int pageIndex = 0, int pageSize = 10)
+        {
+            return await PaginateFiltered(r => r.Status == status && r.IsDeleted == false, pageIndex, pageSize);
         }
     }
 }

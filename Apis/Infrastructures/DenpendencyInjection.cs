@@ -17,10 +17,8 @@ namespace Infrastructures
             //services.AddScoped<IUserRepository, UserRepository>();
             //services.AddScoped<IRoleRepository, RoleRepository>();\
             services.AddScoped<IPackageRepository, PackageRepository>();
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IPackageService, PackageService>();
-            services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IRestaurantRepository, RestaurantRepository>();
             services.AddScoped<IRestaurantService, RestaurantService>();
             services.AddScoped<IOrderRepository, OrderRepository>();
@@ -31,6 +29,10 @@ namespace Infrastructures
             services.AddScoped<IReviewService, ReviewService>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<IWalletService, WalletService>();
             //services.AddScoped<IUserService, UserService>();
             //services.AddScoped<IRoleService, RoleService>();
             // ATTENTION: if you do migration please check file README.md

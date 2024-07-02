@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
+using Application.Utils;
 using Application.ViewModels.RestaurantViewModels;
 using AutoMapper;
 using Domain.Entities;
@@ -18,10 +20,11 @@ namespace Application.Services
             _mapper = mapper;
         }
 
-        public async Task<List<RestaurantViewModel>> GetRestaurantsAsync()
+        public async Task<Pagination<RestaurantViewModel>> GetRestaurantsAsync(int pageIndex = 0, int pageSize = 10)
         {
             var restaurants = await _unitOfWork.RestaurantRepository.GetAllNotDeletedAsync();
-            return _mapper.Map<List<RestaurantViewModel>>(restaurants);
+            var paginatedRestaurants = await ListPagination<RestaurantViewModel>.PaginateList(_mapper.Map<List<RestaurantViewModel>>(restaurants), pageIndex, pageSize);
+            return paginatedRestaurants;
         }
 
         public async Task<RestaurantViewModel?> GetRestaurantByIdAsync(int restaurantId)
@@ -69,7 +72,28 @@ namespace Application.Services
 
             restaurant.IsDeleted = true;
             _unitOfWork.RestaurantRepository.Update(restaurant);
-            return await _unitOfWork.SaveChangeAsync() > 0;
+
+            var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+            if (isSuccess)
+            {
+                var userId = restaurant.UserId;
+                if (userId.HasValue)
+                {
+                    var userRestaurants = await _unitOfWork.RestaurantRepository.GetAllNotDeletedAsync();
+                    if (userRestaurants.All(r => r.UserId != userId))
+                    {
+                        var user = await _unitOfWork.AccountRepository.GetByIdAsync(userId.Value);
+                        if (user != null)
+                        {
+                            user.RoleId = 2;
+                            _unitOfWork.AccountRepository.Update(user);
+                            await _unitOfWork.SaveChangeAsync();
+                        }
+                    }
+                }
+            }
+
+            return isSuccess;
         }
     }
 }
