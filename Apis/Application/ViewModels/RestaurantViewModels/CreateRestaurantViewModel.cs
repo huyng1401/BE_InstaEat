@@ -14,8 +14,6 @@ namespace Application.ViewModels.RestaurantViewModels
 
         [Required(ErrorMessage = "Address is required")]
         public string? Address { get; set; }
-        [Required(ErrorMessage = "Image link is required")]
-        public string? Image { get; set; }
 
         [Required(ErrorMessage = "Open time is required")]
         public TimeSpan? OpenTime { get; set; }
