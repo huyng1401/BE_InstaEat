@@ -70,7 +70,6 @@ namespace Infrastructures
 
                 entity.Property(e => e.RestaurantId).HasColumnName("RestaurantID");
                 entity.Property(e => e.Address).HasMaxLength(255);
-                entity.Property(e => e.Image).HasMaxLength(255);
                 entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
                 entity.Property(e => e.RestaurantName)
                     .IsRequired()
