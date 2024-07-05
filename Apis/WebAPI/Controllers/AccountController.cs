@@ -100,7 +100,7 @@ namespace WebAPI.Controllers
                 return Unauthorized("Invalid username or password.");
             }
 
-            return Ok(new { Token = token });
+            return Ok(new { Token = token.Value.Token, UserId = token.Value.UserId });
         }
 
         [HttpPut("{id}")]

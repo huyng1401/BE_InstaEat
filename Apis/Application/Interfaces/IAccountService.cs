@@ -15,7 +15,7 @@ namespace Application.Interfaces
         Task<AccountViewModel?> GetAccountByIdAsync(int accountId);
         Task<AccountViewModel?> Register (RegisterRequestModel register);
         Task<AccountViewModel?> RegisterAsRestaurant(RegisterAsRestaurantRequestModel register);
-        Task<string?> LoginAsync(LoginRequestModel loginRequestModel, string secretKey);
+        Task<(string Token, int UserId)?> LoginAsync(LoginRequestModel loginRequestModel, string secretKey);
         Task<bool> UpdateAccountAsync(int accountId, UpdateAccountViewModel account);
         Task<bool> DeleteAccountAsync(int accountId);
     }
