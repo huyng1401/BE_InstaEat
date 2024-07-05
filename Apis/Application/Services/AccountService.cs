@@ -113,7 +113,7 @@ namespace Application.Services
             return null;
         }
 
-        public async Task<(string Token, int UserId)?> LoginAsync(LoginRequestModel loginRequestModel, string secretKey)
+        public async Task<(string Token, AccountViewModel Profile)?> LoginAsync(LoginRequestModel loginRequestModel, string secretKey)
         {
             var accounts = await _unitOfWork.AccountRepository.GetAllNotDeletedAsync();
             var account = accounts.FirstOrDefault(a => a.Username == loginRequestModel.UserName && a.Password == loginRequestModel.Password);
@@ -124,7 +124,8 @@ namespace Application.Services
             }
 
             var accessToken = account.GenerateJsonWebToken(secretKey, DateTime.Now);
-            return (accessToken, account.UserId);
+            var profile = _mapper.Map<AccountViewModel>(account);
+            return (accessToken, profile);
         }
 
         public async Task<bool> UpdateAccountAsync(int accountId, UpdateAccountViewModel account)
