@@ -19,7 +19,8 @@ namespace Application.Utils
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name , account.Username),
-                new Claim(ClaimTypes.Role ,account.RoleId.ToString()),
+                new Claim(ClaimTypes.Role , account.RoleId.ToString()),
+                new Claim("UserId", account.UserId.ToString())
             };
             var token = new JwtSecurityToken(
                 claims: claims,
