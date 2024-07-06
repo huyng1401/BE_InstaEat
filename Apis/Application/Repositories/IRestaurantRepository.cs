@@ -9,5 +9,7 @@ namespace Application.Repositories
 {
     public interface IRestaurantRepository : IGenericRepository<Restaurant>
     {
+        Task<Restaurant?> GetByUserIdAsync(int userId);
+
     }
 }

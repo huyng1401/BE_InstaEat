@@ -153,21 +153,26 @@ namespace Application.Services
                 return false;
             }
 
+            // Mark account as deleted
             account.IsDeleted = true;
             _unitOfWork.AccountRepository.Update(account);
-            var restaurant = await _unitOfWork.RestaurantRepository.GetByIdAsync(accountId);
+
+            // Find and mark associated restaurant as deleted if it exists
+            var restaurant = await _unitOfWork.RestaurantRepository.GetByUserIdAsync(account.UserId);
             if (restaurant != null)
             {
                 restaurant.IsDeleted = true;
                 _unitOfWork.RestaurantRepository.Update(restaurant);
             }
 
-            var wallet = await _unitOfWork.WalletRepository.GetByIdAsync(accountId);
+            // Find and mark associated wallet as deleted if it exists
+            var wallet = await _unitOfWork.WalletRepository.GetByUserIdAsync(account.UserId);
             if (wallet != null)
             {
                 wallet.IsDeleted = true;
                 _unitOfWork.WalletRepository.Update(wallet);
             }
+
             return await _unitOfWork.SaveChangeAsync() > 0;
         }
     }

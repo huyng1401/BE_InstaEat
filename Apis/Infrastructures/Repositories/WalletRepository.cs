@@ -1,5 +1,6 @@
 ﻿using Application.Repositories;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,10 @@ namespace Infrastructures.Repositories
         public WalletRepository(AppDbContext context) : base(context)
         {
 
+        }
+        public async Task<Wallet?> GetByUserIdAsync(int userId)
+        {
+            return await _dbSet.FirstOrDefaultAsync(w => w.UserId == userId && (w.IsDeleted == false || w.IsDeleted == null));
         }
     }
 }
